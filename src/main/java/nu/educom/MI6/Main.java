@@ -1,8 +1,13 @@
 package nu.educom.MI6;
+import java.sql.SQLException;
+
 import java.awt.GridLayout;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +21,7 @@ public class Main {
   static JLabel message;
 
   public static void main(String[] args) {
-
+    //SQLQuerier.getAll();
     JFrame frame = new JFrame("MI6");
     JPanel panel = new JPanel();
 
@@ -47,18 +52,70 @@ public class Main {
 
   private static class LoginAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
+      //String userNum = serviceNumberInput.getText();
       String userNum = serviceNumberInput.getText();
+      String passphrase = passwordInput.getText();
       String input = e.getActionCommand();
-      userNum = userNumber(userNum);
-      boolean login = userLogin();
-      if (login) {
-        message.setText("Login successful, welcome " + userNum);
-      } else {
-        message.setText("ACCESS DENIED");
-        blackList.add(userNum);
+      boolean auth = SQLQuerier.authenticateAgent(userNum,passphrase);
+      long minutesRemaining = 0;
+      // Whether it fails or not, we should check if its a viable number for the login tracker
+      List<String> numbers = new ArrayList<>();
+      for (int i = 1; i <= 999; i++) {
+        numbers.add(String.format("%03d", i));
       }
-      System.out.println("Test");
-    }
+      if (numbers.contains(userNum)) {
+
+        StringBuilder failedAttemptsMessage = new StringBuilder();
+        List<LoginAttempts> failedAttempts = SQLQuerier.getLastLoginAttempts(userNum);
+        //And then I need all recent login fails this is for either:
+        // 1) A successful login, and to display all failed logins
+        // 2) A failed login, and to calculate wait time
+        // And to check if the cooldown is still ongoing, which means: time check
+        // Now we want to calculate a few things
+        // How much cooldown time is remaining, and whether or not the failed attempt should be documented
+        if (!failedAttempts.isEmpty()) {
+          Timestamp loginTime = failedAttempts.get(0).getLoginTime();
+          LocalDateTime now = LocalDateTime.now();
+          LocalDateTime specificDate = loginTime.toLocalDateTime();
+          Duration duration = Duration.between(specificDate, now);
+          long minutesSinceLastFail = duration.toMinutes();
+          // With minutesSinceLastFail, we can calculate wait time (note for later, if there is no failedAttempts prior, minutes since lastFail can default to 1
+          // Since you only come here if you had at least one prior failed attempt
+          long cooldown = 1;
+
+          for (LoginAttempts attempt : failedAttempts) {
+            // Access the details of each failed login attempt
+            int id = attempt.getId();
+            String servNumber = attempt.getServiceNumber();
+            Timestamp loginTimeM = attempt.getLoginTime();
+            boolean loginSuccess = attempt.isLoginSuccess();
+
+            // Append the details to the StringBuilder
+            failedAttemptsMessage.append("ID: ").append(id)
+                    .append(", Service Number: ").append(servNumber)
+                    .append(", Login Time: ").append(loginTimeM)
+                    .append(", Success: ").append(loginSuccess)
+                    .append(System.lineSeparator()); // Add newline
+
+            cooldown = cooldown * 2;
+          }
+          minutesRemaining = cooldown - minutesSinceLastFail;
+          }
+        if (minutesRemaining > 0){
+          auth = false;
+        } else {
+          SQLQuerier.loginAttemptUpdate(userNum, auth);
+        }
+        if (auth){
+          message.setText(failedAttemptsMessage.toString());
+          System.out.println(failedAttemptsMessage);
+          SQLQuerier.loginAttemptUpdate(userNum, auth);
+        } else {
+          message.setText("Login failed, please wait " + minutesRemaining + " minutes to try again");
+        }
+
+        }
+      }
   }
 
   public static boolean userLogin(){
