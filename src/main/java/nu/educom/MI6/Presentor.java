@@ -19,7 +19,6 @@ public class Presentor {
         if (Objects.equals(command, "login")){
            handleLogin();
         }
-
     }
 
     public static void handleLogin(){
