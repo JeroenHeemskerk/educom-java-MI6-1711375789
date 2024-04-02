@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class JFrameView {
+public class JFrameView implements Contact.iJFrameView{
     private ActionListener loginButton = new LoginAction();
     static JTextField serviceNumberInput;
     static JTextField passwordInput;
