@@ -11,7 +11,7 @@ public interface Contact {
     interface iMi6Model {
         boolean validateLogin(String userNum, String password);
         List<LoginAttempts> fetchLogins(String userNum);
-        void calculateCooldownTime();
+        int calculateCooldownTime(List<LoginAttempts> failedAttempts);
     }
 
     interface iPresentor {

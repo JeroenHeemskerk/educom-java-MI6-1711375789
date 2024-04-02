@@ -1,6 +1,8 @@
 package nu.educom.MI6;
 
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,9 +19,50 @@ public class Mi6Model implements Contact.iMi6Model {
         List<LoginAttempts> failedAttempts = SQLQuerier.getLastLoginAttempts(userNum);
         return failedAttempts;
     }
-    public void calculateCooldownTime() {
 
+    public void uploadLoginAttempt(String userNum, boolean auth){
+        SQLQuerier.loginAttemptUpdate(userNum, auth);
+    }
+    public int calculateCooldownTime(List<LoginAttempts> failedAttempts) {
+        // You only have to calculate cooldown time if a failed attempt was found
+        int cooldown = 0;
+        if (!failedAttempts.isEmpty()) {
+            cooldown = 1;
+            Timestamp loginTime = failedAttempts.getFirst().getLoginTime();
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime specificDate = loginTime.toLocalDateTime();
+            Duration duration = Duration.between(specificDate, now);
+            int minutesSinceLastFail = (int) duration.toMinutes();
+            for (LoginAttempts ignored : failedAttempts){
+                cooldown = cooldown * 2;
+            }
+            cooldown = cooldown - minutesSinceLastFail;
+        }
+        return cooldown;
     }
 
+    public String generateLoginMessage(String serviceNumber, List<LoginAttempts> failedAttempts) {
+        StringBuilder messageLogin = new StringBuilder();
+        Agent license = SQLQuerier.getAgent(serviceNumber);
+        String licenseActive = license.getLicensed();
+        String licenseExpiration = license.getExpiration();
+        messageLogin.append("Licensed: ").append(licenseActive)
+                .append("Expires on:").append(licenseExpiration);
 
+        for (LoginAttempts attempt : failedAttempts) {
+            // Access the details of each failed login attempt
+            int id = attempt.getId();
+            String servNumber = attempt.getServiceNumber();
+            Timestamp loginTimeM = attempt.getLoginTime();
+            boolean loginSuccess = attempt.isLoginSuccess();
+
+            // Append the details to the StringBuilder
+            messageLogin.append("ID: ").append(id)
+                    .append(", Service Number: ").append(servNumber)
+                    .append(", Login Time: ").append(loginTimeM)
+                    .append(", Success: ").append(loginSuccess)
+                    .append(System.lineSeparator()); // Add newline
+        }
+        return messageLogin.toString();
+    }
 }

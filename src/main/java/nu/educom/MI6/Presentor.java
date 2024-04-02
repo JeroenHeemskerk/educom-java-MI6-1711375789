@@ -1,5 +1,8 @@
 package nu.educom.MI6;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,27 +19,37 @@ public class Presentor {
     }
 
     public static void handleCommand(String command) {
+        if (Objects.equals(command, "login")){
+           handleLogin();
+        }
 
+    }
+
+    public static void handleLogin(){
         // Input validation happens here in the Presentor
+        String text = "";
         String serviceNumber = view.serviceNumberInput.getText();
         String password = view.passwordInput.getText();
         serviceNumber = bond(serviceNumber);
-        if (Objects.equals(command, "login")){
-            // one thing I want to do before even validating the password is check if its a service number
-            List<String> serviceNumbers = serviceNumbers();
-            if (!serviceNumbers.contains(serviceNumber)){
-                view.showMessage("Dit is geen servicenummer");
+        List<String> serviceNumbers = serviceNumbers();
+        if (!serviceNumbers.contains(serviceNumber)){
+            view.showMessage("This is not a service number");
+
+        } else {
+            boolean auth = model.validateLogin(serviceNumber, password);
+            List<LoginAttempts> failedAttempts = model.fetchLogins(serviceNumber);
+            int cooldown = model.calculateCooldownTime(failedAttempts);
+            if (cooldown > 0){
+                text = "You have to wait " + cooldown + " minutes";
+                auth = false;
             } else {
-                boolean auth = model.validateLogin(serviceNumber, password);
-                List<LoginAttempts> failedAttempts = model.fetchLogins(serviceNumber);
-                System.out.println(failedAttempts);
-                view.showMessage(serviceNumber);
+                SQLQuerier.loginAttemptUpdate(serviceNumber, auth);
+            }
+            if (auth){
+                text = model.generateLoginMessage(serviceNumber, failedAttempts);
             }
         }
-
-
-        System.out.println(serviceNumber);
-
+        view.showMessage(text);
     }
 
     public static List<String> serviceNumbers(){
