@@ -35,7 +35,7 @@ public class SQLQuerier {
         try (var conn = MySQLConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, serviceNumber);
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     String servNumber = rs.getString("servicenumber");
                     String licenced = rs.getString("licenced_to_kill");
                     String expiration = rs.getString("licence_expiration");
