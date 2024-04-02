@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SQLQuerier {
-    public static void getAll(){
+    public static void getAll() {
         String sql = "SELECT * " +
                 "FROM agent";
         try (var conn = MySQLConnection.connect();
-             var stmt  = conn.createStatement();
-             var rs    = stmt.executeQuery(sql)) {
+             var stmt = conn.createStatement();
+             var rs = stmt.executeQuery(sql)) {
 
             // loop through the result set
             while (rs.next()) {
@@ -27,19 +27,42 @@ public class SQLQuerier {
         }
     }
 
-    public static List<LoginAttempts> getLastLoginAttempts(String serviceNumber){
+    public static Agent getAgent(String serviceNumber) {
+        Agent agent = null;
+        String sql = "SELECT servicenumber, licenced_to_kill, licence_expiration, passphrase " +
+                "FROM agent " +
+                "WHERE servicenumber = ?;";
+        try (var conn = MySQLConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, serviceNumber);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String servNumber = rs.getString("servicenumber");
+                    String licenced = rs.getString("licenced_to_kill");
+                    String expiration = rs.getString("licence_expiration");
+                    String passphrase = rs.getString("passphrase");
+                    agent = new Agent(servNumber, licenced, expiration, passphrase);
+                }
+            }
+            return agent;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
+    public static List<LoginAttempts> getLastLoginAttempts(String serviceNumber) {
         List<LoginAttempts> loginAttemptsList = new ArrayList<>();
         //The LEFT JOIN is based on the most recent successful login
         //This allows the login_time to be by comparing this most recent successful login
         //And it works even if there is no recent successful login because then MAX is null
         String sql = "SELECT * FROM login_attempts " +
                 "WHERE login_time >= (" +
-                    "SELECT IFNULL(MAX(login_time), DATE_SUB(NOW(), INTERVAL 2 MINUTE)) " +
-                    "FROM login_attempts " +
-                    "WHERE login_success = true " +
-                    "AND servicenumber = 'your_servicenumber') " +
+                "SELECT MAX(login_time)" +
+                "FROM login_attempts " +
+                "WHERE login_success = true " +
+                "AND servicenumber = ?) " +
                 "AND login_success = false " +
-                "AND servicenumber = 'your_servicenumber' " +
+                "AND servicenumber = ? " +
                 "ORDER BY login_time DESC;";
         try (var conn = MySQLConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, serviceNumber);
@@ -56,47 +79,22 @@ public class SQLQuerier {
                 }
             }
             return loginAttemptsList;
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
 
         return loginAttemptsList;
     }
 
-    public static void loginAttemptUpdate(String serviceNumber, boolean success){
+    public static void loginAttemptUpdate(String serviceNumber, boolean success) {
         String sql = "INSERT INTO login_attempts (servicenumber, login_success) " +
                 "VALUES (?, ?)";
         try (var conn = MySQLConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, serviceNumber);
             pstmt.setBoolean(2, success);
             pstmt.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
-    }
-
-    public static boolean authenticateAgent(String serviceNumber, String secret){
-        // I want to try make the password check an innate part of the query, to minimize access to it
-        boolean auth = false;
-        String sql = "SELECT servicenumber, licenced_to_kill, licence_expiration " +
-                "FROM agent " +
-                "WHERE servicenumber = ? " +
-                "AND passphrase = ? " +
-                "AND Active = 'yes' ";
-        try (var conn = MySQLConnection.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, serviceNumber);
-            pstmt.setString(2, secret);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    auth = true;
-                }
-            }
-        }catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return auth;
     }
 }

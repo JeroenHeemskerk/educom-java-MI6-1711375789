@@ -13,6 +13,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class Main {
+  public static void main(String[] args) {
+    JFrameView view = new JFrameView();
+    Mi6Model model = new Mi6Model();
+    Presentor presentor = new Presentor(model, view);
+
+  }
+/*
   static List<String> blackList = new ArrayList<>();
   private static ActionListener loginButton = new LoginAction();
   static JTextField serviceNumberInput;
@@ -64,7 +71,6 @@ public class Main {
         numbers.add(String.format("%03d", i));
       }
       if (numbers.contains(userNum)) {
-
         StringBuilder failedAttemptsMessage = new StringBuilder();
         List<LoginAttempts> failedAttempts = SQLQuerier.getLastLoginAttempts(userNum);
         //And then I need all recent login fails this is for either:
@@ -107,6 +113,12 @@ public class Main {
           SQLQuerier.loginAttemptUpdate(userNum, auth);
         }
         if (auth){
+          // Have to get the license and expiration date to show
+          Agent license = SQLQuerier.getAgent(userNum);
+          String licenseActive = license.getLicensed();
+          String licenseExpiration = license.getExpiration();
+          failedAttemptsMessage.append("Licensed: ").append(licenseActive)
+                          .append("Expires on:").append(licenseExpiration);
           message.setText(failedAttemptsMessage.toString());
           System.out.println(failedAttemptsMessage);
           SQLQuerier.loginAttemptUpdate(userNum, auth);
@@ -149,5 +161,5 @@ public class Main {
   }
 
 
-
+*/
 }
