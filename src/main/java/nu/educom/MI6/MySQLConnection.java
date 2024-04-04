@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 public class MySQLConnection {
     public static Connection connect() throws SQLException {
-
         try {
             // Register JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -18,7 +17,6 @@ public class MySQLConnection {
             var password = System.getenv(DatabaseConfig.getDbPassword());
             // Open a connection
             return DriverManager.getConnection(jdbcUrl, user, password);
-
         } catch (ClassNotFoundException e) {
             System.err.println("Failed to load JDBC driver class: " + e.getMessage());
             e.printStackTrace();
@@ -26,7 +24,6 @@ public class MySQLConnection {
             System.err.println("Database connection error: " + e.getMessage());
             e.printStackTrace();
         }
-
         return null;
     }
 }

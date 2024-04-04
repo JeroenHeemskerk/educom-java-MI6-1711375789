@@ -82,7 +82,6 @@ public class SQLQuerier {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
-
         return loginAttemptsList;
     }
 

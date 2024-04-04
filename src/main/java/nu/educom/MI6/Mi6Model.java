@@ -5,6 +5,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.mindrot.jbcrypt.BCrypt;
+
+
 
 public class Mi6Model implements Contact.iMi6Model {
 
@@ -12,7 +15,7 @@ public class Mi6Model implements Contact.iMi6Model {
         boolean auth = false;
         Agent agent = SQLQuerier.getAgent(userNum);
         if (agent != null)
-            auth = Objects.equals(password,agent.getPassphrase());
+            auth = (BCrypt.checkpw(password, agent.getPassphrase()));
         return auth;
     }
     public List<LoginAttempts> fetchLogins(String userNum){

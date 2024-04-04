@@ -39,7 +39,7 @@ public class Presentor {
                 text = "You have to wait " + cooldown + " minutes";
                 auth = false;
             } else {
-                SQLQuerier.loginAttemptUpdate(serviceNumber, auth);
+                model.uploadLoginAttempt(serviceNumber, auth);
             }
             if (auth){
                 text = model.generateLoginMessage(serviceNumber, failedAttempts);
