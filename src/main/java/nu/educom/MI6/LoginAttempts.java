@@ -1,10 +1,12 @@
 package nu.educom.MI6;
 
 import jakarta.persistence.*;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
+@Service
 @Entity
 @Table(name = "login_attempts")
 public class LoginAttempts {

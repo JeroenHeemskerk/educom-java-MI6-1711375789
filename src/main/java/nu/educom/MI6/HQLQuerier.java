@@ -56,7 +56,6 @@ public class HQLQuerier {
     }
 
     public static List<LoginAttempts> readLastLoginAttempts(String serviceNumber) {
-        List<LoginAttempts> loginAttemptsList = new ArrayList<>();
         setUpSessionFactory(); // Ensure session factory is initialized
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
@@ -69,7 +68,7 @@ public class HQLQuerier {
                     "AND loginSuccess = false " +
                     "AND serviceNumber = :serviceNumber " +
                     "ORDER BY loginTime DESC";
-            loginAttemptsList = session.createQuery(queryString, LoginAttempts.class)
+            List<LoginAttempts> loginAttemptsList = session.createQuery(queryString, LoginAttempts.class)
                     .setParameter("serviceNumber", serviceNumber)
                     .setParameter("serviceNumber", serviceNumber)
                     .list();

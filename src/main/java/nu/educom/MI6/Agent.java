@@ -1,7 +1,10 @@
 package nu.educom.MI6;
 
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 @Entity
 @Table(name = "agent")
 public class Agent {
@@ -19,6 +22,7 @@ public class Agent {
 
     public Agent(){
     }
+
     public Agent(int id, String serviceNumber, String passphrase, String active, String licensed, String expiration ) {
         this.id = id;
         this.serviceNumber = serviceNumber;

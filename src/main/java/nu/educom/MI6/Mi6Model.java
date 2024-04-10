@@ -6,7 +6,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class Mi6Model implements Contact.iMi6Model {
 
     public boolean validateLogin(String userNum, String password) {

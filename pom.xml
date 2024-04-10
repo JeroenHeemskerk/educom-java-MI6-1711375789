@@ -65,6 +65,11 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>nu.educom.e-learning</groupId>
+            <artifactId>my-Mi6</artifactId>
+            <version>1</version>
+        </dependency>
     </dependencies>
 
     <build>

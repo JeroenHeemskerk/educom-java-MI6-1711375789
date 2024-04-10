@@ -1,10 +1,13 @@
 package nu.educom.MI6;
 
+import org.springframework.stereotype.Component;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@Component
 public class JFrameView implements Contact.iJFrameView{
     private ActionListener loginButton = new LoginAction();
     static JTextField serviceNumberInput;
