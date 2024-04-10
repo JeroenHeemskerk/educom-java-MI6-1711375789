@@ -13,6 +13,10 @@
     <version>1</version>
     <properties>
         <java.version>22</java.version>
+
+        <MYSQL_USER>${env.MYSQL_USER}</MYSQL_USER>
+        <MYSQL_PASSWORD>${env.MYSQL_PASSWORD}</MYSQL_PASSWORD>
+
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -52,6 +56,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
         </dependency>
     </dependencies>
 

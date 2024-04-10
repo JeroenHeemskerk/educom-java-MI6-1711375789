@@ -1,26 +1,36 @@
 package nu.educom.MI6;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "agent")
 public class Agent {
-    private String passphrase;
-    //private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(name = "servicenumber")
     private String serviceNumber;
-    //private String passphrase;
-    //private String active;
+    private String passphrase;
+    private String active;
+    @Column(name = "licenced_to_kill")
     private String licensed;
+    @Column(name = "licence_expiration")
     private String expiration;
 
-    public Agent(String serviceNumber, String licensed, String expiration, String passphrase) {
-        //this.id = id;
+    public Agent(){
+    }
+    public Agent(int id, String serviceNumber, String passphrase, String active, String licensed, String expiration ) {
+        this.id = id;
         this.serviceNumber = serviceNumber;
         this.passphrase = passphrase;
-        //this.active = active;
+        this.active = active;
         this.licensed = licensed;
         this.expiration = expiration;
     }
 
-    //public int getId() {
-    //    return id;
-    //}
+    public int getId() {
+        return id;
+    }
 
     public String getServiceNumber() {
         return serviceNumber;
@@ -30,9 +40,9 @@ public class Agent {
         return passphrase;
     }
 
-    //public String getActive() {
-    //    return active;
-    //}
+    public String getActive() {
+        return active;
+    }
 
     public String getLicensed() {
         return licensed;

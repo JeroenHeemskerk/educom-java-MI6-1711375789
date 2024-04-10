@@ -29,18 +29,21 @@ public class SQLQuerier {
 
     public static Agent getAgent(String serviceNumber) {
         Agent agent = null;
-        String sql = "SELECT servicenumber, licenced_to_kill, licence_expiration, passphrase " +
+        String sql = "SELECT * " +
                 "FROM agent " +
                 "WHERE servicenumber = ?;";
         try (var conn = MySQLConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, serviceNumber);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+                    int id = rs.getInt("id");
                     String servNumber = rs.getString("servicenumber");
+                    String passphrase = rs.getString("passphrase");
+                    String active = rs.getString("Active");
                     String licenced = rs.getString("licenced_to_kill");
                     String expiration = rs.getString("licence_expiration");
-                    String passphrase = rs.getString("passphrase");
-                    agent = new Agent(servNumber, licenced, expiration, passphrase);
+
+                    agent = new Agent(id, servNumber, passphrase, active, licenced, expiration);
                 }
             }
             return agent;
@@ -74,7 +77,7 @@ public class SQLQuerier {
                     Timestamp loginTime = rs.getTimestamp("login_time");
                     boolean loginSuccess = rs.getBoolean("login_success");
 
-                    LoginAttempts loginAttempt = new LoginAttempts(id, servNumber, loginTime, loginSuccess);
+                    LoginAttempts loginAttempt = new LoginAttempts(servNumber, loginTime, loginSuccess);
                     loginAttemptsList.add(loginAttempt);
                 }
             }

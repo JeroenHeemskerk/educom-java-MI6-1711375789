@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Objects;
 import org.mindrot.jbcrypt.BCrypt;
 
-
-
 public class Mi6Model implements Contact.iMi6Model {
 
     public boolean validateLogin(String userNum, String password) {
         boolean auth = false;
-        Agent agent = SQLQuerier.getAgent(userNum);
+        Agent agent = HQLQuerier.readAgent(userNum);
         if (agent != null)
             auth = (BCrypt.checkpw(password, agent.getPassphrase()));
         return auth;
@@ -24,7 +22,7 @@ public class Mi6Model implements Contact.iMi6Model {
     }
 
     public void uploadLoginAttempt(String userNum, boolean auth){
-        SQLQuerier.loginAttemptUpdate(userNum, auth);
+        HQLQuerier.updateLoginAttempt(userNum, auth);
     }
     public int calculateCooldownTime(List<LoginAttempts> failedAttempts) {
         // You only have to calculate cooldown time if a failed attempt was found
