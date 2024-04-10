@@ -17,7 +17,7 @@ public class Mi6Model implements Contact.iMi6Model {
         return auth;
     }
     public List<LoginAttempts> fetchLogins(String userNum){
-        List<LoginAttempts> failedAttempts = SQLQuerier.getLastLoginAttempts(userNum);
+        List<LoginAttempts> failedAttempts = HQLQuerier.readLastLoginAttempts(userNum);
         return failedAttempts;
     }
 

@@ -7,10 +7,11 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.junit.jupiter.api.AfterEach;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HQLQuerier {
-
     private static SessionFactory sessionFactory;
-
     private static void setUpSessionFactory() {
 
         String mysqlUser = System.getenv("MYSQL_USER");
@@ -50,6 +51,32 @@ public class HQLQuerier {
             return agent;
         } catch (Exception e) {
             System.out.println("Error reading agent: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static List<LoginAttempts> readLastLoginAttempts(String serviceNumber) {
+        List<LoginAttempts> loginAttemptsList = new ArrayList<>();
+        setUpSessionFactory(); // Ensure session factory is initialized
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            String queryString = "FROM LoginAttempts " +
+                    "WHERE loginTime >= (" +
+                    "SELECT MAX(loginTime) " +
+                    "FROM LoginAttempts " +
+                    "WHERE loginSuccess = true " +
+                    "AND serviceNumber = :serviceNumber) " +
+                    "AND loginSuccess = false " +
+                    "AND serviceNumber = :serviceNumber " +
+                    "ORDER BY loginTime DESC";
+            loginAttemptsList = session.createQuery(queryString, LoginAttempts.class)
+                    .setParameter("serviceNumber", serviceNumber)
+                    .setParameter("serviceNumber", serviceNumber)
+                    .list();
+            session.getTransaction().commit();
+            return loginAttemptsList;
+        } catch (Exception e) {
+            System.out.println("Error reading loginAttempts: " + e.getMessage());
             return null;
         }
     }
