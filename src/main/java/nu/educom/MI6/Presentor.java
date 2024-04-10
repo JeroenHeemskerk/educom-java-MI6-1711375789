@@ -1,20 +1,30 @@
 package nu.educom.MI6;
 
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@SpringBootApplication
+@Controller
 public class Presentor {
     private static Mi6Model model;
     private static JFrameView view;
+    public static void main(String[] args) {
+        SpringApplication.run(Presentor.class, args);
+    }
 
     public Presentor(Mi6Model model, JFrameView view) {
         this.model = model;
         this.view = view;
         this.view.RegisterPresentorListener(this);
+        System.setProperty("java.awt.headless", "false");
         view.JFrameView();
     }
 
