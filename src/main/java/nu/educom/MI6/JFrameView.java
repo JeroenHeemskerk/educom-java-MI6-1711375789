@@ -52,7 +52,7 @@ public class JFrameView implements Contact.iJFrameView{
     }
     private class LoginAction implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            Presentor.handleCommand( e.getActionCommand());
+            presentor.handleCommand( e.getActionCommand());
         }
     }
 }
