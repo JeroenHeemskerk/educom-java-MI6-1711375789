@@ -4,11 +4,9 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 @Component
 public class Mi6Model implements Contact.iMi6Model {
@@ -30,8 +28,7 @@ public class Mi6Model implements Contact.iMi6Model {
     }
     @Override
     public List<LoginAttempts> fetchLogins(String userNum){
-        List<LoginAttempts> failedAttempts = hqlQuerier.readLastLoginAttempts(userNum);
-        return failedAttempts;
+        return hqlQuerier.readLastLoginAttempts(userNum);
     }
 
     public void uploadLoginAttempt(String userNum, boolean auth){

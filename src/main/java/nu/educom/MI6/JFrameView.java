@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 @Component
 public class JFrameView implements Contact.iJFrameView{
-    private ActionListener loginButton = new LoginAction();
+    private final ActionListener loginButton = new LoginAction();
     static JTextField serviceNumberInput;
     static JTextField passwordInput;
     static JLabel message;
