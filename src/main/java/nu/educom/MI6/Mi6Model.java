@@ -6,26 +6,34 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-@Repository
+@Component
 public class Mi6Model implements Contact.iMi6Model {
+
+    private final HQLQuerier hqlQuerier;
+
+    @Autowired
+    public Mi6Model(HQLQuerier hqlQuerier) {
+        this.hqlQuerier = hqlQuerier;
+    }
 
     public boolean validateLogin(String userNum, String password) {
         boolean auth = false;
-        Agent agent = HQLQuerier.readAgent(userNum);
+        Agent agent = hqlQuerier.readAgent(userNum);
         if (agent != null)
             auth = (BCrypt.checkpw(password, agent.getPassphrase()));
         return auth;
     }
     public List<LoginAttempts> fetchLogins(String userNum){
-        List<LoginAttempts> failedAttempts = HQLQuerier.readLastLoginAttempts(userNum);
+        List<LoginAttempts> failedAttempts = hqlQuerier.readLastLoginAttempts(userNum);
         return failedAttempts;
     }
 
     public void uploadLoginAttempt(String userNum, boolean auth){
-        HQLQuerier.updateLoginAttempt(userNum, auth);
+        hqlQuerier.updateLoginAttempt(userNum, auth);
     }
     public int calculateCooldownTime(List<LoginAttempts> failedAttempts) {
         // You only have to calculate cooldown time if a failed attempt was found
