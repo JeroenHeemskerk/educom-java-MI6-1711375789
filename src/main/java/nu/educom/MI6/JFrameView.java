@@ -15,10 +15,12 @@ public class JFrameView implements Contact.iJFrameView{
     static JLabel message;
     private Presentor presentor;
 
+    @Override
     public void RegisterPresentorListener(Presentor presentor) {
         this.presentor = presentor;
     }
 
+    @Override
     public void showMessage(String messageText){
         message.setText(messageText);
     }

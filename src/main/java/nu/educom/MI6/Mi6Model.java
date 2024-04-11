@@ -20,6 +20,7 @@ public class Mi6Model implements Contact.iMi6Model {
         this.hqlQuerier = hqlQuerier;
     }
 
+    @Override
     public boolean validateLogin(String userNum, String password) {
         boolean auth = false;
         Agent agent = hqlQuerier.readAgent(userNum);
@@ -27,6 +28,7 @@ public class Mi6Model implements Contact.iMi6Model {
             auth = (BCrypt.checkpw(password, agent.getPassphrase()));
         return auth;
     }
+    @Override
     public List<LoginAttempts> fetchLogins(String userNum){
         List<LoginAttempts> failedAttempts = hqlQuerier.readLastLoginAttempts(userNum);
         return failedAttempts;
@@ -35,6 +37,7 @@ public class Mi6Model implements Contact.iMi6Model {
     public void uploadLoginAttempt(String userNum, boolean auth){
         hqlQuerier.updateLoginAttempt(userNum, auth);
     }
+    @Override
     public int calculateCooldownTime(List<LoginAttempts> failedAttempts) {
         // You only have to calculate cooldown time if a failed attempt was found
         int cooldown = 0;

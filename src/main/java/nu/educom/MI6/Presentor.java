@@ -1,6 +1,7 @@
 package nu.educom.MI6;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
@@ -13,13 +14,14 @@ import java.util.Objects;
 
 @SpringBootApplication
 @Controller
-public class Presentor {
+public class Presentor implements  Contact.iPresentor {
     private static Mi6Model model;
     private static JFrameView view;
     public static void main(String[] args) {
         SpringApplication.run(Presentor.class, args);
     }
 
+    @Autowired
     public Presentor(Mi6Model model, JFrameView view) {
         this.model = model;
         this.view = view;
@@ -27,8 +29,8 @@ public class Presentor {
         System.setProperty("java.awt.headless", "false");
         view.JFrameView();
     }
-
-    public static void handleCommand(String command) {
+    @Override
+    public void handleCommand(String command) {
         if (Objects.equals(command, "login")){
            handleLogin();
         }
